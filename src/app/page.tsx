@@ -2,49 +2,104 @@
 
 import Image from "next/image";
 import { Phone, Shield, CheckCircle2, Star, Users, Award, MapPin, Calendar, Sofa, Building, Brush, Home as HomeIcon } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
 export default function Home() {
   const leafletRef = useRef<HTMLDivElement>(null);
+  const [pdfQuality, setPdfQuality] = useState<'high' | 'medium' | 'web'>('high');
+
+  // Quality presets for PDF generation
+  const qualitySettings = {
+    high: {
+      scale: 3,
+      jpegQuality: 0.95,
+      label: 'High Quality (Larger file)',
+      description: '95% quality, best for printing'
+    },
+    medium: {
+      scale: 2.5,
+      jpegQuality: 0.85,
+      label: 'Medium Quality (Balanced)',
+      description: '85% quality, good balance'
+    },
+    web: {
+      scale: 2,
+      jpegQuality: 0.75,
+      label: 'Web Quality (Smaller file)',
+      description: '75% quality, optimized for sharing'
+    }
+  };
 
   const downloadPDF = async () => {
     if (!leafletRef.current) return;
     
+    const settings = qualitySettings[pdfQuality];
     const pages = leafletRef.current.querySelectorAll('.leaflet-page');
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a5'
+      format: 'a5',
+      compress: true, // Enable PDF compression
+      precision: 2    // Reduce precision for smaller file size
     });
 
     for (let i = 0; i < pages.length; i++) {
       const canvas = await html2canvas(pages[i] as HTMLElement, {
-        scale: 2,
+        scale: settings.scale,
         useCORS: true,
-        logging: false
+        logging: false,
+        allowTaint: true,   // Allow cross-origin images
+        backgroundColor: '#ffffff', // Ensure white background
+        removeContainer: true,      // Clean up DOM
+        imageTimeout: 15000,        // Longer timeout for images
+        width: 1748,        // Explicit dimensions matching your CSS
+        height: 2480,
+        windowWidth: 1748,
+        windowHeight: 2480
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      // Use JPEG with selected quality
+      const imgData = canvas.toDataURL('image/jpeg', settings.jpegQuality);
       
       if (i > 0) {
         pdf.addPage();
       }
       
-      pdf.addImage(imgData, 'PNG', 0, 0, 148, 210);
+      // Add image with compression
+      pdf.addImage(imgData, 'JPEG', 0, 0, 148, 210, undefined, 'FAST');
     }
     
-    pdf.save('dustblasters-leaflet.pdf');
+    pdf.save(`dustblasters-leaflet-${pdfQuality}.pdf`);
   };
 
   return (
     <>
-      {/* Download Button */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Download Controls */}
+      <div className="fixed top-4 right-4 z-50 bg-white rounded-lg shadow-xl p-4 border">
+        <div className="mb-3">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            PDF Quality:
+          </label>
+          <select
+            value={pdfQuality}
+            onChange={(e) => setPdfQuality(e.target.value as 'high' | 'medium' | 'web')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            {Object.entries(qualitySettings).map(([key, settings]) => (
+              <option key={key} value={key}>
+                {settings.label}
+              </option>
+            ))}
+          </select>
+          <div className="text-xs text-gray-500 mt-1">
+            {qualitySettings[pdfQuality].description}
+          </div>
+        </div>
         <button
           onClick={downloadPDF}
-          className="bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-semibold"
+          className="w-full bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-semibold text-sm"
         >
           Download PDF
         </button>
