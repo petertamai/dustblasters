@@ -1,222 +1,502 @@
+'use client';
+
 import Image from "next/image";
-import { Phone, Shield, Clock, CheckCircle2, Star, Users, Sparkles, Home as HomeIcon, QrCode } from "lucide-react";
+import { Phone, Shield, CheckCircle2, Star, Users, Award, MapPin, Calendar, Sofa, Building, Brush, Home as HomeIcon } from "lucide-react";
+import { useRef } from "react";
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
 
 export default function Home() {
+  const leafletRef = useRef<HTMLDivElement>(null);
+
+  const downloadPDF = async () => {
+    if (!leafletRef.current) return;
+    
+    const pages = leafletRef.current.querySelectorAll('.leaflet-page');
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a5'
+    });
+
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await html2canvas(pages[i] as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      
+      if (i > 0) {
+        pdf.addPage();
+      }
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, 148, 210);
+    }
+    
+    pdf.save('dustblasters-leaflet.pdf');
+  };
+
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans" style={{
-      width: "595px", 
-      minHeight: "842px",
-      margin: "0 auto",
-      padding: "0",
-      fontSize: "14px",
-      lineHeight: "1.4"
-    }}>
-      {/* A5 Leaflet - Front Side */}
-      <div className="relative w-full h-full p-6 bg-gradient-to-br from-blue-50 to-white">
-        
-        {/* Header with Logo */}
-        <div className="text-center mb-6">
-          <div className="text-4xl font-bold mb-2">
-            <span className="text-red-600">DUST</span><span className="text-gray-800">BLASTERS</span>
-          </div>
-          <div className="text-blue-700 font-semibold text-lg tracking-wide">
-            CLEANING SERVICES
-          </div>
-        </div>
+    <>
+      {/* Download Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={downloadPDF}
+          className="bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-semibold"
+        >
+          Download PDF
+        </button>
+      </div>
 
-        {/* Trust Badge */}
-        <div className="bg-blue-600 text-white text-center py-3 px-4 rounded-lg mb-6 shadow-lg">
-          <div className="font-bold text-xl mb-1">Peterborough&apos;s Most Trusted</div>
-          <div className="text-lg">Carpet Cleaning Company</div>
-          <div className="flex justify-center items-center mt-2 gap-1">
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <span className="ml-2 font-semibold">110+ Five Star Reviews</span>
-          </div>
-        </div>
-
-        {/* Main Value Proposition */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-3 leading-tight">
-            Professional Carpet Cleaning<br />You Can Trust
-          </h1>
-          <p className="text-lg text-gray-700 mb-4">
-            Over 10 years serving local Peterborough families with safe, 
-            effective carpet & upholstery cleaning
-          </p>
-        </div>
-
-        {/* Key Benefits */}
-        <div className="grid grid-cols-1 gap-4 mb-6">
-          <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-500">
-            <Shield className="w-6 h-6 text-green-600" />
-            <div>
-              <div className="font-semibold text-gray-800">Family-Safe Products</div>
-              <div className="text-sm text-gray-600">Non-toxic, pet-friendly cleaning solutions</div>
-            </div>
-          </div>
+      {/* Leaflet Container */}
+      <div className="bg-gray-100 min-h-screen py-8 flex flex-col items-center">
+        <div ref={leafletRef} className="space-y-8">
           
-          <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
-            <Clock className="w-6 h-6 text-blue-600" />
-            <div>
-              <div className="font-semibold text-gray-800">Quick Dry Technology</div>
-              <div className="text-sm text-gray-600">Advanced equipment - ready to use in hours</div>
+          {/* Front Page */}
+          <div 
+            className="leaflet-page bg-white relative overflow-hidden"
+            style={{
+              width: "1748px",
+              height: "2480px",
+              padding: "120px",
+              fontFamily: "var(--font-poppins)",
+            }}
+          >
+            {/* Background Pattern */}
+            <div className="absolute top-0 right-0 w-2/3 h-2/3 opacity-5">
+              <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+
+            {/* Header Section */}
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-16">
+                <div>
+                  <div className="text-8xl font-bold mb-4">
+                    <span className="text-red-600">DUST</span><span className="text-gray-900">BLASTERS</span>
+                  </div>
+                  <div className="text-4xl text-gray-700 font-medium">CLEANING SERVICES - WWW.DUSTBLASTERS.CO.UK</div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-4 text-red-600 mb-4">
+                    <Phone className="w-12 h-12" />
+                    <div className="text-5xl font-bold">07547 593160</div>
+                  </div>
+                  <div className="text-3xl text-gray-700">Call Today for Free Quote</div>
+                </div>
+              </div>
+
+              {/* Trust Badge Section */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-3xl p-12 mb-16 shadow-2xl">
+                <div className="text-center">
+                  <div className="text-6xl font-bold mb-6">Peterborough&apos;s Most Trusted Cleaners</div>
+                  <div className="text-5xl mb-8">Carpet, Upholstery, Domestic</div>
+                  <div className="flex justify-center items-center gap-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-16 h-16 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <div className="text-4xl font-semibold mt-6">110+ Five-Star Google Reviews</div>
+                  <div className="text-3xl mt-4 opacity-90">3 Times More Than Other Local Companies</div>
+                </div>
+              </div>
+
+              {/* Main Value Proposition */}
+              <div className="text-center mb-20">
+                <h1 className="text-7xl font-bold text-gray-900 mb-8 leading-tight">
+                  Your Local Family-Run Team<br />
+                  Caring for Peterborough Homes<br />
+                  Since 2014
+                </h1>
+                <p className="text-4xl text-gray-700 leading-relaxed max-w-6xl mx-auto">
+                Professional Standards • Family Values • Fully Insured
+                </p>
+              </div>
+
+              {/* Customer Reviews Section */}
+              <div className="mb-20">
+                <div className="text-5xl font-bold text-center text-gray-900 mb-12">
+                  What Our Customers Say - Real Reviews
+                </div>
+                <div className="grid grid-cols-3 gap-10">
+                  {/* Google Review Card 1 */}
+                  <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16">
+                        <Image
+                          src="/gogole.svg"
+                          alt="Google Reviews"
+                          width={64}
+                          height={64}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xl font-semibold text-gray-900">Google Score</div>
+                        <div className="text-3xl font-bold text-orange-500">5.0</div>
+                      </div>
+                    </div>
+                    <div className="flex mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-6 h-6 fill-orange-500 text-orange-500" />
+                      ))}
+                    </div>
+                    <div className="text-xl text-gray-700 mb-4 leading-relaxed flex-grow">
+                      &ldquo;Michael is a true professional. He has been cleaning our carpets for the last three years
+                      and they always come up a treat, smell fresh...&rdquo;
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900 mt-auto">- Mrs. Sian, Peterborough</div>
+                  </div>
+
+                  {/* Google Review Card 2 */}
+                  <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16">
+                        <Image
+                          src="/gogole.svg"
+                          alt="Google Reviews"
+                          width={64}
+                          height={64}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xl font-semibold text-gray-900">Google Score</div>
+                        <div className="text-3xl font-bold text-orange-500">5.0</div>
+                      </div>
+                    </div>
+                    <div className="flex mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-6 h-6 fill-orange-500 text-orange-500" />
+                      ))}
+                    </div>
+                    <div className="text-xl text-gray-700 mb-4 leading-relaxed flex-grow">
+                      &ldquo;Michael is very experienced and knowledgeable in the job. 
+                      Discussed the job with us and offered very professional advice. Very tidy workers...&rdquo;
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900 mt-auto">- Mr. Russ, Peterborough</div>
+                  </div>
+
+                  {/* Google Review Card 3 */}
+                  <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16">
+                        <Image
+                          src="/gogole.svg"
+                          alt="Google Reviews"
+                          width={64}
+                          height={64}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xl font-semibold text-gray-900">Google Score</div>
+                        <div className="text-3xl font-bold text-orange-500">5.0</div>
+                      </div>
+                    </div>
+                    <div className="flex mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-6 h-6 fill-orange-500 text-orange-500" />
+                      ))}
+                    </div>
+                    <div className="text-xl text-gray-700 mb-4 leading-relaxed flex-grow">
+                      &ldquo;Highly recommend Michael and his team. 
+                      They always do a thorough job, and are reliable, professional and friendly. My carpets and ovens look like new!&rdquo;
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900 mt-auto">- Mrs. Davies, Bretton</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Photo Section */}
+              <div className="bg-gray-50 rounded-3xl p-12 mb-16">
+                <div className="text-center mb-8">
+                  <div className="text-4xl font-bold text-gray-900 mb-4">
+                    Meet Your Local Cleaning Experts
+                  </div>
+                  <div className="text-3xl text-gray-700">
+                    Professional, Friendly, and Ready to Help
+                  </div>
+                </div>
+                <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-xl">
+                  <Image
+                    src="/dust-min.jpg"
+                    alt="DustBlasters Professional Team"
+                    fill
+                    className="object-cover object-center"
+                  />
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-3xl p-16 text-center shadow-2xl">
+                <div className="text-6xl font-bold mb-6">Book Your Free Quote Today</div>
+                <div className="flex justify-center items-center gap-6 mb-8">
+                  <Phone className="w-20 h-20" />
+                  <div className="text-8xl font-bold">07547 593160</div>
+                </div>
+                <div className="text-4xl">No Obligation • Free Consultation • Same Day Response</div>
+              </div>
+
+              {/* Bottom Trust Signals */}
+              <div className="flex justify-around items-center mt-16 pt-12 border-t-4 border-gray-200">
+                <div className="flex items-center gap-4">
+                  <CheckCircle2 className="w-12 h-12 text-green-600" />
+                  <span className="text-3xl text-gray-700">Fully Insured</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Award className="w-12 h-12 text-green-600" />
+                  <span className="text-3xl text-gray-700">10+ Years Experience</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <MapPin className="w-12 h-12 text-green-600" />
+                  <span className="text-3xl text-gray-700">All Peterborough Areas</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-purple-500">
-            <Users className="w-6 h-6 text-purple-600" />
-            <div>
-              <div className="font-semibold text-gray-800">Local Family Business</div>
-              <div className="text-sm text-gray-600">Fully insured, professional Peterborough team</div>
+          {/* Back Page */}
+          <div 
+            className="leaflet-page bg-white relative overflow-hidden"
+            style={{
+              width: "1748px",
+              height: "2480px",
+              padding: "120px",
+              fontFamily: "var(--font-poppins)",
+            }}
+          >
+            {/* Header */}
+            <div className="text-center mb-16">
+              <div className="text-7xl font-bold mb-4">
+                <span className="text-red-600">DUST</span><span className="text-gray-900">BLASTERS</span>
+              </div>
+              <div className="text-4xl text-gray-700">Why Peterborough Families Choose Us</div>
             </div>
-          </div>
-        </div>
 
-        {/* Prominent Phone Number */}
-        <div className="bg-red-600 text-white text-center py-4 px-6 rounded-xl mb-6 shadow-lg">
-          <div className="flex justify-center items-center gap-3 mb-2">
-            <Phone className="w-8 h-8" />
-            <div className="text-3xl font-bold tracking-wide">07547 593160</div>
-          </div>
-          <div className="text-lg font-semibold">Call for FREE No-Obligation Quote</div>
-          <div className="text-sm mt-1 opacity-90">Available now - we respect your time</div>
-        </div>
+            {/* Key Benefits Grid */}
+            <div className="mb-20">
+ 
+              <div className="grid grid-cols-2 gap-8">
+                <div className="bg-white border border-gray-300 rounded-2xl p-10 shadow-sm">
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <Shield className="w-16 h-16 text-gray-900" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900 mb-4">100% Safe & Non-Toxic</div>
+                      <div className="text-2xl text-gray-700 leading-relaxed">
+                        Family & pet-friendly products. No harsh chemicals, 
+                        just effective cleaning that&apos;s safe for everyone.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-white border border-gray-300 rounded-2xl p-10 shadow-sm">
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <Shield className="w-16 h-16 text-gray-900" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900 mb-4">Fully Insured</div>
+                      <div className="text-2xl text-gray-700 leading-relaxed">
+                        Complete insurance coverage and DBS-checked professionals. 
+                        Your peace of mind is guaranteed.
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-        {/* Team Photo Section */}
-        <div className="text-center mb-4">
-          <div className="relative w-full h-24 mb-3 overflow-hidden rounded-lg border-2 border-gray-200">
-            <Image
-              src="/dustblasters_team.webp"
-              alt="DustBlasters Professional Team - Local Peterborough Carpet Cleaners"
-              fill
-              className="object-cover object-center"
-            />
-          </div>
-          <div className="text-sm text-gray-700 font-medium">
-            Meet our professional, friendly local team
-          </div>
-        </div>
+                <div className="bg-white border border-gray-300 rounded-2xl p-10 shadow-sm">
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <Users className="w-16 h-16 text-gray-900" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900 mb-4">DBS-Checked</div>
+                      <div className="text-2xl text-gray-700 leading-relaxed">
+                        Professional, DBS-checked specialists. 
+                        We treat your home with respect and care.
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-        {/* Bottom Trust Signals */}
-        <div className="flex justify-center gap-4 text-sm text-gray-700 border-t border-gray-200 pt-4">
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            <span>Fully Insured</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            <span>10+ Years Experience</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            <span>No Hidden Costs</span>
+                <div className="bg-white border border-gray-300 rounded-2xl p-10 shadow-sm">
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <Award className="w-16 h-16 text-gray-900" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900 mb-4">Powerful Equipment</div>
+                      <div className="text-2xl text-gray-700 leading-relaxed">
+                        We use top-grade cleaning machines that remove 99% of dirt and leave your 
+                        carpets nearly dry right away.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Before & After Section */}
+            <div className="bg-gray-50 rounded-3xl p-12 mb-20">
+              <div className="text-5xl font-bold text-center text-gray-900 mb-12">
+                See The DustBlasters Difference
+              </div>
+              <div className="grid grid-cols-3 gap-10">
+                <div className="text-center">
+                  <div className="bg-white rounded-xl p-6 shadow-lg">
+                    <div className="relative w-full h-64 rounded-lg mb-4 overflow-hidden">
+                      <Image
+                        src="/stain.webp"
+                        alt="Professional Stain Removal Before and After"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-2xl font-semibold">Stain Removal</div>
+                    <div className="text-xl text-gray-600 mt-2">Expert treatment for tough stains</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="bg-white rounded-xl p-6 shadow-lg">
+                    <div className="relative w-full h-64 rounded-lg mb-4 overflow-hidden">
+                      <Image
+                        src="/deep1.webp"
+                        alt="Deep Carpet Cleaning Results"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-2xl font-semibold">Deep Cleaning</div>
+                    <div className="text-xl text-gray-600 mt-2">Removes 99% of bacteria & allergens</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="bg-white rounded-xl p-6 shadow-lg">
+                    <div className="relative w-full h-64 rounded-lg mb-4 overflow-hidden">
+                      <Image
+                        src="/like_new.webp"
+                        alt="Carpet Restoration - Like New Results"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-2xl font-semibold">Like New Again</div>
+                    <div className="text-xl text-gray-600 mt-2">Restores original appearance</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Services */}
+            <div className="mb-20">
+              <div className="text-5xl font-bold text-center text-gray-900 mb-12">
+                Complete Cleaning Solutions
+              </div>
+              <div className="grid grid-cols-2 gap-8">
+                <div className="flex items-center gap-6 bg-blue-50 rounded-xl p-8">
+                  <HomeIcon className="w-16 h-16 text-gray-700" />
+                  <div>
+                    <div className="text-3xl font-semibold text-gray-900">End of Tenancy Cleaning</div>
+                    <div className="text-2xl text-gray-700">Professional deep clean for deposits</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6 bg-gray-50 rounded-xl p-8">
+                  <Sofa className="w-16 h-16 text-gray-700" />
+                  <div>
+                    <div className="text-3xl font-semibold text-gray-900">Upholstery Cleaning</div>
+                    <div className="text-2xl text-gray-700">Sofas, chairs, and fabric furniture</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6 bg-gray-100 rounded-xl p-8">
+                  <Building className="w-16 h-16 text-gray-700" />
+                  <div>
+                    <div className="text-3xl font-semibold text-gray-900">Commercial Cleaning</div>
+                    <div className="text-2xl text-gray-700">Offices, shops, and businesses</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6 bg-blue-100 rounded-xl p-8">
+                  <Brush className="w-16 h-16 text-gray-700" />
+                  <div>
+                    <div className="text-3xl font-semibold text-gray-900">Regular House Cleaning</div>
+                    <div className="text-2xl text-gray-700">Weekly or monthly service available</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Section */}
+            <div className="bg-gradient-to-r from-gray-100 to-gray-200 rounded-3xl p-8">
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900 mb-6">Book Your Cleaning Today</div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <Phone className="w-12 h-12 text-gray-700" />
+                    <div>
+                      <div className="text-4xl font-bold text-red-600">07547 593160</div>
+                      <div className="text-lg text-gray-700">Call for immediate response</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <Calendar className="w-12 h-12 text-gray-700" />
+                    <div className="text-lg text-gray-700">
+                      Flexible scheduling • 7 days a week
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <MapPin className="w-12 h-12 text-gray-700" />
+                    <div className="text-lg text-gray-700">
+                      Serving all Peterborough areas & villages
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="bg-white rounded-2xl p-8 shadow-xl">
+                    <div className="grid grid-cols-2 gap-6 items-center">
+                      <div className="text-center">
+                        <div className="relative w-32 h-32 mx-auto mb-4">
+                          <Image
+                            src="/gogole.svg"
+                            alt="Google Reviews"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="text-xl font-semibold text-gray-900 mb-1">
+                          Google Reviews
+                        </div>
+                        <div className="text-lg text-gray-600">
+                          4.9 Rating
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="relative w-32 h-32 mx-auto mb-4">
+                          <Image
+                            src="/qrcode.png"
+                            alt="QR Code for Google Reviews - DustBlasters"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="text-lg font-semibold text-gray-900 mb-1">
+                          Scan to Read Reviews
+                        </div>
+                        <div className="text-lg text-gray-600">
+                          See why we&apos;re #1
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* A5 Leaflet - Back Side */}
-      <div className="relative w-full h-full p-6 bg-white border-t-2 border-gray-200" style={{
-        marginTop: "20px"
-      }}>
-        
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="text-3xl font-bold mb-2">
-            <span className="text-red-600">DUST</span><span className="text-gray-800">BLASTERS</span>
-          </div>
-          <div className="text-lg text-gray-700">Complete Cleaning Solutions for Your Home</div>
-        </div>
-
-        {/* Additional Services */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
-            Did You Know We Also Offer:
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 text-sm">
-              <HomeIcon className="w-4 h-4 text-blue-600" />
-              <span>End of Tenancy Cleaning</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Sparkles className="w-4 h-4 text-blue-600" />
-              <span>After Builders Cleaning</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="w-4 h-4 text-blue-600" />
-              <span>Commercial Cleaning</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <HomeIcon className="w-4 h-4 text-blue-600" />
-              <span>Regular House Cleaning</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Why Choose Us */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
-            Why Peterborough Families Choose Us:
-          </h2>
-          <div className="space-y-3">
-            <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
-              <div className="font-semibold text-gray-800">British-Made Professional Equipment</div>
-              <div className="text-sm text-gray-600">We invest in the best Airflex Storm systems for superior results</div>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
-              <div className="font-semibold text-gray-800">Flexible Scheduling</div>
-              <div className="text-sm text-gray-600">We work around your timetable with respectful, punctual service</div>
-            </div>
-            <div className="bg-purple-50 p-3 rounded-lg border-l-4 border-purple-500">
-              <div className="font-semibold text-gray-800">Transparent Pricing</div>
-              <div className="text-sm text-gray-600">Clear quotes with no hidden costs or surprises</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer Testimonial */}
-        <div className="bg-yellow-50 p-4 rounded-lg mb-6 border-2 border-yellow-200">
-          <div className="flex justify-center mb-2">
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-          </div>
-          <div className="text-center text-gray-700 italic mb-2">
-            &ldquo;They were punctual, professional, and friendly. The carpet looks and smells lovely, 
-            even though we have two large dogs. Will definitely use again.&rdquo;
-          </div>
-          <div className="text-center text-sm font-semibold text-gray-800">
-            - Verified Google Review
-          </div>
-        </div>
-
-        {/* Contact Information */}
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600 mb-1">07547 593160</div>
-                <div className="text-sm text-gray-700">Call for immediate response</div>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-300 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                <QrCode className="w-8 h-8 text-gray-600" />
-              </div>
-              <div className="text-xs text-gray-600">Scan for instant quote</div>
-            </div>
-          </div>
-          <div className="text-center mt-4 pt-3 border-t border-gray-300">
-            <div className="text-sm font-semibold text-gray-800">www.dustblasters.co.uk</div>
-            <div className="text-xs text-gray-600 mt-1">Serving all Peterborough areas & villages</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
