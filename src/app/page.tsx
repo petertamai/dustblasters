@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import { Phone, Shield, CheckCircle2, Star, Users, Award, MapPin, Calendar, Sofa, Building, Brush, Home as HomeIcon } from "lucide-react";
+import { Phone, Shield, CheckCircle2, Star, Users, Award, MapPin, Calendar, Sofa, Building, Brush, Home as HomeIcon, FileText } from "lucide-react";
 import { useRef, useState } from "react";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 export default function Home() {
   const leafletRef = useRef<HTMLDivElement>(null);
   const [pdfQuality, setPdfQuality] = useState<'high' | 'medium' | 'web'>('high');
+  const [showQualityPanel, setShowQualityPanel] = useState(false);
 
   // Quality presets for PDF generation
   const qualitySettings = {
@@ -76,33 +77,50 @@ export default function Home() {
 
   return (
     <>
-      {/* Download Controls */}
-      <div className="fixed top-4 right-4 z-50 bg-white rounded-lg shadow-xl p-4 border">
-        <div className="mb-3">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PDF Quality:
-          </label>
-          <select
-            value={pdfQuality}
-            onChange={(e) => setPdfQuality(e.target.value as 'high' | 'medium' | 'web')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            {Object.entries(qualitySettings).map(([key, settings]) => (
-              <option key={key} value={key}>
-                {settings.label}
-              </option>
-            ))}
-          </select>
-          <div className="text-xs text-gray-500 mt-1">
-            {qualitySettings[pdfQuality].description}
-          </div>
-        </div>
+      {/* PDF Download Controls */}
+      <div className="fixed top-4 right-4 z-50">
+        {/* PDF Icon Button */}
         <button
-          onClick={downloadPDF}
-          className="w-full bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-semibold text-sm"
+          onClick={() => setShowQualityPanel(!showQualityPanel)}
+          className="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors mb-2"
+          title="Download PDF"
         >
-          Download PDF
+          <FileText className="w-6 h-6" />
         </button>
+
+        {/* Quality Panel */}
+        {showQualityPanel && (
+          <div className="bg-white rounded-lg shadow-xl p-4 border w-64">
+            <div className="mb-3">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                PDF Quality:
+              </label>
+              <select
+                value={pdfQuality}
+                onChange={(e) => setPdfQuality(e.target.value as 'high' | 'medium' | 'web')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                {Object.entries(qualitySettings).map(([key, settings]) => (
+                  <option key={key} value={key}>
+                    {settings.label}
+                  </option>
+                ))}
+              </select>
+              <div className="text-xs text-gray-500 mt-1">
+                {qualitySettings[pdfQuality].description}
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                downloadPDF();
+                setShowQualityPanel(false);
+              }}
+              className="w-full bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-semibold text-sm"
+            >
+              Download PDF
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Leaflet Container */}
